@@ -1,0 +1,13 @@
+---
+- name: Configure Cassandra & Zookeeper in dc-1
+  hosts: "{{ target_hosts }}"
+  gather_facts: no
+  serial: 1
+  tags: ['ds']
+  vars_files:
+  - ~/.apigee-secure/credentials.yml
+  - ~/.apigee/custom-properties.yml
+  roles:
+  - { role: apigee-opdk-setup-component, profile: 'ds', tags: ['apigee-setup'] }
+  - { role: apigee-opdk-start-components, tags: ['apigee-component'] }
+  - { role: apigee-opdk-setup-status, tags: ['status'] }

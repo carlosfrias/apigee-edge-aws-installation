@@ -1,0 +1,82 @@
+---
+# AWS AMI Id
+image_id: ami-7209f41f
+
+# AWS Subnet Id
+vpc_subnet_id: subnet-3fbcb64b
+
+# AWS SSH Keyname
+key_name: cfrias
+
+# AWS Region
+aws_region: us-east-1
+
+# AWS Instance Tags
+instance_tags:
+- { Name: 'apigee-edge-dev' }
+- { owner_contact_info: 'cfrias@apigee.com' }
+- { bag: 'infrastructure' }
+- { point_of_contact: 'cs-technical@apigee.com' }
+
+# AWS Disk Allocations
+volume_type: gp2
+volume_size: 30
+delete_on_termination: true
+device_name: /dev/sda1
+
+# AWS Instance type
+instance_type: 't2.medium'
+
+# Ansible wait for AWS to Complete
+wait: yes
+
+# AWS Assigns Public IP to instances
+assign_public_ip: yes
+
+# AWS Security Group Name
+security_group: OPDK
+
+# AWS Security Group Definition
+security_group_description: Default OPDK ports
+rules:
+  - proto: tcp
+    cidr_ip: 0.0.0.0/0
+    from_port: 80
+    to_port: 80
+  - proto: tcp
+    cidr_ip: 0.0.0.0/0
+    from_port: 9000
+    to_port: 9010
+  - proto: tcp
+    cidr_ip: 0.0.0.0/0
+    from_port: 8080
+    to_port: 8080
+  - proto: tcp
+    cidr_ip: 0.0.0.0/0
+    from_port: 22
+    to_port: 22
+  - proto: tcp
+    cidr_ip: 0.0.0.0/0
+    from_port: 443
+    to_port: 443
+  - proto: tcp
+    cidr_ip: 172.16.0.0/12
+    from_port: 0
+    to_port: 65535
+rules_egress:
+  - proto: tcp
+    cidr_ip: 0.0.0.0/0
+    from_port: 80
+    to_port: 80
+  - proto: tcp
+    cidr_ip: 172.16.0.0/12
+    from_port: 0
+    to_port: 65535
+  - proto: tcp
+    cidr_ip: 0.0.0.0/0
+    from_port: 443
+    to_port: 443
+  - proto: udp
+    cidr_ip: 0.0.0.0/0
+    from_port: 123
+    to_port: 123

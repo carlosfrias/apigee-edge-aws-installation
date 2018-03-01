@@ -1,0 +1,14 @@
+---
+- name: Install Postgres
+  hosts: "{{ target_hosts }}"
+  gather_facts: no
+  serial: 1
+  tags: ['pg', 'pgcommon']
+  vars_files:
+  - ~/.apigee-secure/credentials.yml
+  - ~/.apigee/custom-properties.yml
+  roles:
+  - { role: apigee-opdk-setup-component, profile: 'ps', tags: ['apigee-component'] }
+  - { role: apigee-opdk-start-components, tags: ['apigee-component'] }
+  - { role: apigee-opdk-server-self, server_types: ['ps'], tags: ['self']  }
+  - { role: apigee-opdk-setup-status, tags: ['status'] }

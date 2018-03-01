@@ -1,0 +1,11 @@
+---
+- name: Update cache for nodes
+  hosts: "{{ target_hosts }}"
+  gather_facts: yes
+  become: no
+  tags: ['cache']
+  vars_files:
+  - ~/.apigee-secure/credentials.yml
+  - ~/.apigee/custom-properties.yml
+  roles:
+  - { role: apigee-opdk-setup-default-settings }

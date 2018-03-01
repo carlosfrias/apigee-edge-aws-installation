@@ -1,0 +1,19 @@
+---
+- name: Configure Postgres Master
+  hosts: "{{ pg_master_node }}"
+  gather_facts: no
+  serial: 1
+  tags: ['pg', 'pgmaster']
+  roles:
+  - { role: apigee-opdk-setup-postgres-master }
+  - { role: apigee-opdk-setup-status, tags: ['status'] }
+
+- name: Configure Postgres Standby
+  hosts: "{{ pg_standby_node }}"
+  gather_facts: no
+  serial: 1
+  tags: ['pg', 'pgstandby']
+  roles:
+  - { role: apigee-opdk-stop-components, component_name: 'apigee-postgresql' }
+  - { role: apigee-opdk-setup-postgres-standby }
+  - { role: apigee-opdk-setup-status, tags: ['status'] }

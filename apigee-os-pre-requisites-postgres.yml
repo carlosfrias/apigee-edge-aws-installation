@@ -1,0 +1,22 @@
+---
+- name: Update Postgres master nodes with OS pre-requisites
+  hosts: pg
+  tags: ['os-pre-req']
+  gather_facts: no
+  vars_files:
+  - ~/.apigee-secure/credentials.yml
+  - ~/.apigee/custom-properties.yml
+  roles:
+  - { role: apigee-opdk-setup-os-postgres, tags: ['pg-os-pre-req'] }
+  - { role: apigee-opdk-setup-postgres-config, tags: ['pg-os-pre-req'] }
+
+- name: Update Postgres standby nodes with OS pre-requisites
+  hosts: pgstandby
+  tags: ['os-pre-req']
+  gather_facts: no
+  vars_files:
+  - ~/.apigee-secure/credentials.yml
+  - ~/.apigee/custom-properties.yml
+  roles:
+  - { role: apigee-opdk-setup-os-postgres, tags: ['pg-os-pre-req'] }
+  - { role: apigee-opdk-setup-postgres-config, tags: ['pg-os-pre-req'], clear_pgdata: True }

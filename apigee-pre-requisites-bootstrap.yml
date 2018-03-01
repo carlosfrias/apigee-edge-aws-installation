@@ -1,0 +1,16 @@
+---
+- name: Setup bootstrap for the planet
+  hosts: "{{ target_hosts }}"
+  gather_facts: no
+  vars_files:
+  - ~/.apigee-secure/credentials.yml
+  - ~/.apigee/custom-properties.yml
+  strategy: free
+  tags: ['bootstrap']
+  roles:
+  - { role: apigee-opdk-setup-target-links, tags: ['links'] }
+  - { role: apigee-opdk-setup-apigee-user, tags: ['apigee-user'] }
+  - { role: apigee-opdk-setup-apigee-user-ownership, tags: ['apigee-user'] }
+  - { role: apigee-opdk-setup-java-home, tags: ['java-home'] }
+  - { role: apigee-opdk-setup-bootstrap, tags: ['apigee-bootstrap'] }
+  - { role: apigee-opdk-setup-license, tags: ['license'] }

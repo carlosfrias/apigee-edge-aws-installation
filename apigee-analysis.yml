@@ -1,0 +1,478 @@
+---
+- name: Update planet cache
+  import_playbook: apigee-planet-cache.yml
+  tags: ['cache']
+  vars:
+    target_hosts: edge
+
+- name: Show Zookeeper Leader
+  hosts: ds
+  gather_facts: no
+  tags: ['leader']
+  serial: 1
+  tasks:
+  - name: Display Zookeeper Leadership
+    shell: "echo srvr | nc localhost 2181 | grep Mode:"
+    register: result
+
+  - name: Report Results
+    debug:
+      var: result
+
+- name: Show Zookeeper Status
+  hosts: ds
+  gather_facts: no
+  tags: ['status']
+  serial: 1
+  tasks:
+  - name: Display Zookeeper Leadership
+    shell: "echo srvr | nc localhost 2181"
+    register: result
+
+  - name: Report Results
+    debug:
+      var: result
+
+- name: Show Cassandra Ring
+  hosts: ds
+  gather_facts: no
+  tags: ['ring']
+  serial: 1
+  tasks:
+  - name: Display Cassandra Ring
+    shell: "{{ nodetool }} ring"
+    register: result
+
+  - name: Report Results
+    debug:
+      var: result
+
+- name: Show Cassandra Status
+  hosts: ds
+  gather_facts: no
+  tags: ['status']
+  serial: 1
+  tasks:
+  - name: Display Cassandra Status
+    shell: "{{ nodetool }} status"
+    register: result
+
+  - name: Report Results
+    debug:
+      var: result
+
+- name: Show Cassandra Replication Factor
+  hosts: ds
+  gather_facts: no
+  tags: ['replication']
+  tasks:
+  - name: Display Cassandra Replication Factor
+    shell: "{{ cqlsh }} -e 'select * from system.schema_keyspaces' {{ private_address}}"
+    register: result
+
+  - name: Report Results
+    debug:
+      var: result
+
+- name: Show Cassandra Topology Properties
+  hosts: ds
+  gather_facts: no
+  tags: ['topology']
+  tasks:
+  - name: Display cassandra-topology.properties
+    shell: "cat {{ apigee_home }}/apigee-cassandra/conf/cassandra-topology.properties | grep -A100 '^# Cassandra Node IP'"
+    register: result
+
+  - name: Report Results
+    debug:
+      var: result
+
+- name: Show Cassandra Properties
+  hosts: ds
+  gather_facts: no
+  tags: ['properties']
+  tasks:
+  - name: Display cassandra-topology.properties
+    shell: "cat {{ apigee_home }}/apigee-cassandra/conf/cassandra.yaml | grep 'seeds:\\|^listen_address:'"
+    register: result
+
+  - name: Report Results
+    debug:
+      var: result
+
+- name: Show Postgres Master Check
+  hosts: pgmaster
+  gather_facts: no
+  tags: ['replication']
+  tasks:
+  - name: Display Postgres Master Status Check
+    shell: "{{ apigee_service }} apigee-postgresql postgres-check-master"
+    register: result
+
+  - name: Report Results
+    debug:
+      var: result
+
+- name: Show Postgres Standby Check
+  hosts: pgstandby
+  gather_facts: no
+  tags: ['replication']
+  tasks:
+  - name: Display Postgres Standby Status Check
+    shell: "{{ apigee_service }} apigee-postgresql postgres-check-standby"
+    register: result
+
+  - name: Report Results
+    debug:
+      var: result
+
+- name: Show Node Status
+  hosts: planet
+  gather_facts: no
+  tags: ['status']
+  serial: 1
+  tasks:
+  - name: Display Node Status
+    shell: "{{ apigee_all }} status"
+    register: result
+
+  - name: Report Results
+    debug:
+      var: result
+
+- name: Start Node
+  hosts: planet
+  gather_facts: no
+  tags: ['start']
+  serial: 1
+  tasks:
+  - name: Start Node
+    shell: "{{ apigee_all }} start"
+    register: result
+
+  - name: Report Results
+    debug:
+      var: result
+
+- name: Stop Node
+  hosts: planet
+  gather_facts: no
+  tags: ['stop']
+  serial: 1
+  tasks:
+  - name: Stop Node
+    shell: "{{ apigee_all }} stop"
+    register: result
+
+  - name: Report Results
+    debug:
+      var: result
+
+- name: Restart Node
+  hosts: planet
+  gather_facts: no
+  tags: ['restart']
+  serial: 1
+  tasks:
+  - name: Stop Node
+    shell: "{{ apigee_all }} restart"
+    register: result
+
+  - name: Report Results
+    debug:
+      var: result
+
+- name: Component versions
+  hosts: planet
+  gather_facts: no
+  tags: ['version']
+  serial: 1
+  tasks:
+  - name: Component versions echo Apigee version
+    shell: "{{ apigee_all }} version"
+    register: result
+
+  - name: Report Results
+    debug:
+      var: result
+
+- name: Management server self report
+  hosts: ms
+  gather_facts: no
+  tags: ['ms-self', 'self']
+  serial: 1
+  pre_tasks:
+  - name: Load credentials
+    include_vars: '~/.apigee-secure/credentials.yml'
+
+  roles:
+  - { role: apigee-opdk-server-self, server_types: ['ms'], tags: ['self'] }
+
+- name: Router self report
+  hosts: rmp
+  gather_facts: no
+  tags: ['r-self', 'self']
+  serial: 1
+  pre_tasks:
+  - name: Load credentials
+    include_vars: '~/.apigee-secure/credentials.yml'
+
+  roles:
+  - { role: apigee-opdk-server-self, server_types: ['r'], tags: ['self'] }
+
+- name: Message Processor self report
+  hosts: rmp
+  tags: ['mp-self', 'self']
+  serial: 1
+  pre_tasks:
+  - name: Load credentials
+    include_vars: '~/.apigee-secure/credentials.yml'
+
+  roles:
+  - { role: apigee-opdk-server-self, server_types: ['mp'], tags: ['self'] }
+
+- name: Qpid self report
+  hosts: qpid
+  gather_facts: no
+  tags: ['qpid-self', 'self']
+  serial: 1
+  pre_tasks:
+  - name: Load credentials
+    include_vars: '~/.apigee-secure/credentials.yml'
+
+  roles:
+  - { role: apigee-opdk-server-self, server_types: ['qs'], tags: ['self'] }
+
+- name: Postgres server self report
+  hosts: pg
+  gather_facts: no
+  tags: ['ps-self', 'self']
+  serial: 1
+  pre_tasks:
+  - name: Load credentials
+    include_vars: '~/.apigee-secure/credentials.yml'
+
+  roles:
+  - { role: apigee-opdk-server-self, server_types: ['ps'], tags: ['self'] }
+
+- name: Router Registration Status
+  hosts: rmp
+  gather_facts: no
+  tags: ['r-registration']
+  pre_tasks:
+  - name: Load credentials
+    include_vars: '~/.apigee-secure/credentials.yml'
+
+  roles:
+    - { role: apigee-opdk-server-registration-state, username: "{{ opdk_user_email }}", password: "{{ opdk_user_pass }}", server_self: "{{ edge_router_self }}", mgmt_server_ip: "{{ local_mgmt_ip }}" }
+
+- name: Message Processor Registration Status
+  hosts: rmp
+  gather_facts: no
+  tags: ['mp-registration']
+  pre_tasks:
+  - name: Load credentials
+    include_vars: '~/.apigee-secure/credentials.yml'
+
+  roles:
+    - { role: apigee-opdk-server-registration-state, username: "{{ opdk_user_email }}", password: "{{ opdk_user_pass }}", server_self: "{{ edge_mp_self }}", mgmt_server_ip: "{{ local_mgmt_ip }}" }
+
+- name: Qpid Registration Status
+  hosts: qpid
+  gather_facts: no
+  tags: ['qpid-registration']
+  pre_tasks:
+  - name: Load credentials
+    include_vars: '~/.apigee-secure/credentials.yml'
+
+  roles:
+    - { role: apigee-opdk-server-registration-state, username: "{{ opdk_user_email }}", password: "{{ opdk_user_pass }}", server_self: "{{ edge_qs_self }}", mgmt_server_ip: "{{ local_mgmt_ip }}" }
+
+- name: Postgres Registration Status
+  hosts: pg
+  gather_facts: no
+  tags: ['pg-registration']
+  pre_tasks:
+  - name: Load credentials
+    include_vars: '~/.apigee-secure/credentials.yml'
+
+  roles:
+    - { role: apigee-opdk-server-registration-state, username: "{{ opdk_user_email }}", password: "{{ opdk_user_pass }}", server_self: "{{ edge_ps_self }}", mgmt_server_ip: "{{ local_mgmt_ip }}" }
+
+- name: Analytics group scope state
+  hosts: ms
+  gather_facts: no
+  tags: ['scope']
+  pre_tasks:
+  - name: Load credentials
+    include_vars: '~/.apigee-secure/credentials.yml'
+
+  roles:
+  - { role: apigee-opdk-setup-scopes-state,
+      ax_group: "{{ scopes_axgroup | default('axgroup001') }}"
+    }
+
+- name: Qpid stats
+  hosts: qpid
+  gather_facts: no
+  tags: ['qpid-stats']
+  serial: 1
+  tasks:
+  - name: Gather qpid stats
+    shell: "{{ qpid-stat }} -g"
+    register: results
+
+- name: Qpid queue depth
+  hosts: qpid
+  gather_facts: no
+  tags: ['qpid-depth']
+  serial: 1
+  tasks:
+  - name: Gather qpid queue depth
+    shell: "{{ check_queue_depth }}"
+    register: results
+
+  - name: Print qpid stats
+    debug:
+      var: results
+
+- name: Display silent-install.conf
+  hosts: planet
+  gather_facts: no
+  tags: ['show-silent-install','response-file']
+  tasks:
+  - name: Display silent-install.conf
+    command: "cat {{ opdk_installation_config_file }}"
+    register: result
+
+  - name: Report Results
+    debug:
+      var: result
+
+- name: Restart server
+  hosts: planet
+  serial: 1
+  gather_facts: no
+  tags: ["server-restart"]
+  roles:
+  - { role: apigee-server-restart }
+
+- name: Show private_address
+  hosts: planet
+  gather_facts: no
+  tags: ['private-address']
+  tasks:
+  - name: Show private_address
+    debug:
+      var: private_address
+
+- name: View LDAP system user
+  hosts: ms
+  gather_facts: no
+  tags: ['ldap']
+
+  pre_tasks:
+  - name: Load credentials
+    include_vars: '~/.apigee-secure/credentials.yml'
+
+  tasks:
+  - name: Show LDAP system user
+    shell: "ldapsearch -D 'cn=manager,dc=apigee,dc=com' -b 'dc=apigee,dc=com' -LLL -h {{ inventory_hostname }} -p {{ ldap_data_port }} -w {{ opdk_ldap_pass }}"
+    register: result
+
+  - name: Report Results
+    debug:
+      var: result
+
+- name: List Users
+  hosts: ms
+  gather_facts: no
+  tags: ['users']
+  pre_tasks:
+  - name: Load credentials
+    include_vars: '~/.apigee-secure/credentials.yml'
+
+  tasks:
+  - name: List users
+    uri:
+      url: "http://127.0.0.1:8080/v1/users"
+      user: "{{ opdk_user_name }}"
+      password: "{{ opdk_user_pass }}"
+    register: result
+
+  - name: Report Results
+    debug:
+      var: result
+
+- name: List Organizations
+  hosts: ms
+  gather_facts: no
+  tags: ['orgs']
+  tasks:
+  - name: List users
+    uri:
+      url: "http://127.0.0.1:8080/v1/organizations"
+      user: "{{ opdk_user_name }}"
+      password: "{{ opdk_user_pass }}"
+    register: result
+
+  - name: Report Results
+    debug:
+      var: result
+
+- name: Analytics status
+  hosts: ms[0]
+  gather_facts: no
+  tags: ['axstatus']
+  pre_tasks:
+  - name: Load credentials
+    include_vars: '~/.apigee-secure/credentials.yml'
+
+  tasks:
+  - name: List users
+    uri:
+      url: "http://127.0.0.1:8080/v1/organizations/{{ org_name }}/environments/{{ env_name }}/provisioning/axstatus"
+      user: "{{ opdk_user_email }}"
+      password: "{{ opdk_user_pass }}"
+    register: result
+
+  - name: Report Results
+    debug:
+      var: result
+
+- name: Analytics groups
+  hosts: ms[0]
+  gather_facts: no
+  tags: ['axgroups']
+  pre_tasks:
+  - name: Load credentials
+    include_vars: '~/.apigee-secure/credentials.yml'
+
+  tasks:
+  - name: List users
+    uri:
+      url: "http://127.0.0.1:8080/v1/analytics/groups/ax"
+      user: "{{ opdk_user_email }}"
+      password: "{{ opdk_user_pass }}"
+    register: result
+
+  - name: Report Results
+    debug:
+      var: result
+
+- name: Describe analytics table
+  hosts: pgmaster
+  gather_facts: no
+  tags: ['axtables']
+  pre_tasks:
+  - name: Load credentials
+    include_vars: '~/.apigee-secure/credentials.yml'
+
+  tasks:
+  - name: Describe postgres analytics table
+    shell: "{{ psql }} -h {{ apigee_home }}/var/run/apigee-postgresql -w {{ pg_pass }} -c \"\\d analytics.'{{ org_name }}.{{ env_name }}.fact'\" -U {{ pg_user }} apigee"
+    register: result
+
+  - name: Report Results
+    debug:
+      var: result

@@ -1,0 +1,25 @@
+---
+- hosts: localhost
+  connection: local
+
+  vars_files:
+  - aws-create-properties.yml
+
+  pre_tasks:
+  - setup:
+
+  - ec2_facts:
+
+  - name: Validate that start is provided
+    fail:
+      msg: Please indicate the starting node
+    when: start is not defined
+
+  - name: Validate that end is provided
+    fail:
+      msg: Please indicate the starting node
+    when: end is not defined
+
+  roles:
+  - apigee-opdk-aws-security-group
+  - apigee-opdk-aws-create

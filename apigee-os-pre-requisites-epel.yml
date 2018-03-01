@@ -1,0 +1,10 @@
+---
+- name: Update nodes with common OS pre-requisites
+  hosts: "{{ target_hosts }}"
+  gather_facts: no
+  tags: ['os-pre-req']
+  vars_files:
+  - ~/.apigee-secure/credentials.yml
+  - ~/.apigee/custom-properties.yml
+  roles:
+  - { role: apigee-opdk-setup-os-epel, tags: ['epel'] }

@@ -1,0 +1,148 @@
+---
+- name: Update planet cache
+  tags: ['cache']
+  import_playbook: apigee-planet-cache.yml
+  vars:
+    target_hosts: edge
+
+- name: Install and configure OS pre-requisites
+  import_playbook: apigee-os-pre-requisites.yml
+  tags: ['os']
+  vars:
+    target_hosts: edge
+
+- name: Install and configure Openldap pre-requisites
+  import_playbook: apigee-os-pre-requisites-epel.yml
+  tags: ['os', 'os-epel']
+  vars:
+    target_hosts: edge
+
+- name: Install and configure Openldap pre-requisites
+  import_playbook: apigee-os-pre-requisites-openldap.yml
+  tags: ['os', 'os-openldap']
+  vars:
+    target_hosts: ms
+
+- name: Install and configure Pip pre-requisites
+  import_playbook: apigee-os-pre-requisites-pip.yml
+  tags: ['os', 'os-pip']
+  vars:
+    target_hosts: edge
+
+- name: Install and configure Postgres pre-requisites
+  import_playbook: apigee-os-pre-requisites-postgres.yml
+  tags: ['os', 'os-postgres']
+  vars:
+    target_hosts: edge
+
+- name: Install Apigee pre-requisites
+  import_playbook: apigee-pre-requisites-bootstrap.yml
+  tags: ['bootstrap']
+  vars:
+    target_hosts: edge
+
+- name: Install Apigee pre-requisites
+  import_playbook: apigee-pre-requisites-common-install.yml
+  tags: ['common']
+  vars:
+    target_hosts: edge
+
+- name: Configure Cassandra & Zookeeper node
+  import_playbook: apigee-edge-configuration.yml
+  tags: ['ds','ds-config','config']
+  vars:
+    target_hosts: ds
+
+- name: Apply configuration to Cassandra & Zookeeper node
+  import_playbook: install-edge-cassandra-zookeeper-component-setup.yml
+  tags: ['ds','ds-setup']
+  vars:
+    target_hosts: ds
+
+- name: Configure MS node
+  import_playbook: apigee-edge-configuration.yml
+  tags: ['ms','ms-config','config']
+  vars:
+    target_hosts: ms
+
+- name: Apply configuration to Management Server node
+  import_playbook: install-edge-management-server-component-setup.yml
+  tags: ['ms','ms-setup']
+  vars:
+    target_hosts: ms
+
+- name: Configure RMP node
+  import_playbook: apigee-edge-configuration.yml
+  tags: ['rmp','rmp-config','config']
+  vars:
+    target_hosts: rmp
+
+- name: Apply configuration to Router & Message Processor node
+  import_playbook: install-edge-rmp-component-setup.yml
+  tags: ['rmp','rmp-setup']
+  vars:
+    target_hosts: rmp
+
+- name: Configure Qpid node
+  import_playbook: apigee-edge-configuration.yml
+  tags: ['qpid','qpid-config','config']
+  vars:
+    target_hosts: qpid
+
+- name: Apply configuration to Qpid node
+  import_playbook: install-edge-qpid-component-setup.yml
+  tags: ['qpid','qpid-setup']
+  vars:
+    target_hosts: qpid
+
+- name: Configure Apigee pre-requisites
+  import_playbook: apigee-edge-configuration.yml
+  tags: ['pg','pg-config','config']
+  vars:
+    target_hosts: pg
+
+- name: Install Postgres node
+  import_playbook: install-edge-pg-component-setup.yml
+  tags: ['pg','pg-setup']
+  vars:
+    target_hosts: pg
+
+- name: Install Postgres node
+  import_playbook: edge-pgmaster-pgstandby-node-config.yml
+  tags: ['pg','pg-expand']
+  vars:
+    pg_master_node: 'pgmaster'
+    pg_standby_node: 'pgstandby'
+
+- name: Setup org
+  import_playbook: install-edge-setup-org.yml
+  tags: ['org']
+  vars:
+    target_hosts: ms[0]
+
+- name: Rolling restart of dc-1
+  hosts: edge
+  serial: 1
+  tags: ['restart']
+  roles:
+  - apigee-opdk-stop-components
+  - apigee-opdk-start-components
+
+- name: Validate Planet Started
+  hosts: ds,ms,rmp,qpid,pg
+  serial: 1
+  tags: ['validate', 'validate-start']
+  roles:
+  - apigee-opdk-start-components
+
+- name: Validate RMP
+  import_playbook: install-edge-rmp-validate.yml
+  tags: ['validate']
+  vars:
+    target_hosts: rmp
+
+- name: Download logs and configs
+  tags: ['logs']
+  import_playbook: apigee-log-config-files.yml
+  vars:
+    target_hosts: edge

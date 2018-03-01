@@ -1,0 +1,11 @@
+---
+- name: Validate RMP proxy functionality on dc-1
+  hosts: "{{ target_hosts }}"
+  serial: 1
+  gather_facts: no
+  vars_files:
+  - ~/.apigee-secure/credentials.yml
+  - ~/.apigee/custom-properties.yml
+  roles:
+  - { role: apigee-opdk-setup-validate, tags: ['validate'] }
+  - { role: apigee-opdk-setup-validate-cleanup, tags: ['validate', 'validate-rmp-cleanup'] }

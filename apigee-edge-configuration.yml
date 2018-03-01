@@ -1,0 +1,11 @@
+---
+- name: Update apigee-pre-req for the planet
+  hosts: "{{ target_hosts }}"
+  gather_facts: no
+  tags: ['apigee-config']
+  vars_files:
+  - ~/.apigee-secure/credentials.yml
+  - ~/.apigee/custom-properties.yml
+  roles:
+  - { role: apigee-opdk-modules }
+  - { role: apigee-opdk-setup-silent-installation-config }
