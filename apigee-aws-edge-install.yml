@@ -32,7 +32,7 @@
   vars:
     Name: 'apigee-edge-dev-pg'
     start: 1
-    end: 2
+    end: 1
 
 - name: Install Edge
   import_playbook: install-edge.yml
