@@ -1,0 +1,39 @@
+---
+- name: Create AWS Instances for DS
+  import_playbook: aws-create.yml
+  vars:
+    Name: 'apigee-edge-dev-ds'
+    start: 1
+    end: 3
+
+- name: Create AWS Instances for MS
+  import_playbook: aws-create.yml
+  vars:
+    Name: 'apigee-edge-dev-ms'
+    start: 1
+    end: 1
+
+- name: Create AWS Instances for RMP
+  import_playbook: aws-create.yml
+  vars:
+    Name: 'apigee-edge-dev-rmp'
+    start: 1
+    end: 2
+
+- name: Create AWS Instances for Qpid
+  import_playbook: aws-create.yml
+  vars:
+    Name: 'apigee-edge-dev-qpid'
+    start: 1
+    end: 2
+
+- name: Create AWS Instances
+  import_playbook: aws-create.yml
+  vars:
+    Name: 'apigee-edge-dev-pg'
+    start: 1
+    end: 2
+
+- name: Install Edge
+  import_playbook: install-edge.yml
+
