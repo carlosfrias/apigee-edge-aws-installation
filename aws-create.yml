@@ -1,5 +1,6 @@
 ---
-- hosts: localhost
+- name: Create AWS instances
+  hosts: localhost
   connection: local
 
   vars_files:
