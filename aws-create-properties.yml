@@ -5,6 +5,9 @@ image_id: ami-7209f41f
 # AWS Subnet Id
 vpc_subnet_id: subnet-3fbcb64b
 
+# AWS VPC Id
+vpc_id: vpc-22936e47
+
 # AWS SSH Keyname
 key_name: cfrias
 
@@ -12,11 +15,10 @@ key_name: cfrias
 aws_region: us-east-1
 
 # AWS Instance Tags
-instance_tags:
-- { Name: 'apigee-edge-dev' }
-- { owner_contact_info: 'cfrias@apigee.com' }
-- { bag: 'infrastructure' }
-- { point_of_contact: 'cs-technical@apigee.com' }
+instance_tags_Name: 'apigee-edge-dev'
+instance_tags_owner_contact_info: 'cfrias@apigee.com'
+instance_tags_bag: 'infrastructure'
+instance_tags_point_of_contact: 'cs-technical@apigee.com'
 
 # AWS Disk Allocations
 volume_type: gp2
