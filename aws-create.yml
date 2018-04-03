@@ -9,7 +9,7 @@
   pre_tasks:
   - setup:
 
-  - ec2_facts:
+  - ec2_metadata_facts:
 
   - name: Validate that start is provided
     fail:
