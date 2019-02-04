@@ -342,7 +342,7 @@
   tags: ['show-silent-install','response-file']
   tasks:
   - name: Display silent-install.conf
-    command: "cat {{ opdk_installation_config_file }}"
+    command: "cat {{ target_response_file_path }}"
     register: result
 
   - name: Report Results
